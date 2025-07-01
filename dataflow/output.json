@@ -1,0 +1,132 @@
+{
+	"name": "output",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_Customer_data",
+						"type": "DatasetReference"
+					},
+					"name": "cutomer"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_Orders_data",
+						"type": "DatasetReference"
+					},
+					"name": "orders"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_datalakeoutput",
+						"type": "DatasetReference"
+					},
+					"name": "output"
+				}
+			],
+			"transformations": [
+				{
+					"name": "selectedcolumnscu"
+				},
+				{
+					"name": "selectedColumns"
+				},
+				{
+					"name": "QC1"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "agg"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          customer_id as integer,",
+				"          customer_name as string,",
+				"          email as string,",
+				"          city as string,",
+				"          created_at as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> cutomer",
+				"source(output(",
+				"          order_id as integer,",
+				"          customer_id as integer,",
+				"          order_date as date,",
+				"          amount as integer,",
+				"          status as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> orders",
+				"cutomer select(mapColumn(",
+				"          customer_id,",
+				"          customer_name,",
+				"          created_at",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectedcolumnscu",
+				"orders select(mapColumn(",
+				"          order_id,",
+				"          customer_id,",
+				"          amount,",
+				"          status",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectedColumns",
+				"selectedColumns filter(!(status == 'Pending' || status == 'Cancelled')) ~> QC1",
+				"QC1, selectedcolumnscu join(selectedColumns@customer_id == selectedcolumnscu@customer_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 aggregate(groupBy(selectedColumns@customer_id,",
+				"          order_id,",
+				"          status,",
+				"          customer_name),",
+				"     amount = sum(amount)) ~> agg",
+				"agg sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          ORDERNUMBER as string,",
+				"          QUANTITYORDERED as string,",
+				"          PRICEEACH as string,",
+				"          ORDERLINENUMBER as string,",
+				"          SALES as string,",
+				"          ORDERDATE as string,",
+				"          STATUS as string,",
+				"          QTR_ID as string,",
+				"          MONTH_ID as string,",
+				"          YEAR_ID as string,",
+				"          PRODUCTLINE as string,",
+				"          MSRP as string,",
+				"          PRODUCTCODE as string,",
+				"          CUSTOMERNAME as string,",
+				"          PHONE as string,",
+				"          ADDRESSLINE1 as string,",
+				"          ADDRESSLINE2 as string,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          POSTALCODE as string,",
+				"          COUNTRY as string,",
+				"          TERRITORY as string,",
+				"          CONTACTLASTNAME as string,",
+				"          CONTACTFIRSTNAME as string,",
+				"          DEALSIZE as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> output"
+			]
+		}
+	}
+}

@@ -1,0 +1,9 @@
+{
+	"name": "firstnewsp",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "fd844ded-8c19-4954-b108-f4a0d5f7b20a",
+		"tenantId": "c52fa399-7ddb-4ff4-abeb-6a51191cc106"
+	}
+}

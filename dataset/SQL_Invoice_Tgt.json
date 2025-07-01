@@ -1,0 +1,37 @@
+{
+	"name": "SQL_Invoice_Tgt",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "invoice_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "customer_name",
+				"type": "varchar"
+			},
+			{
+				"name": "invoice_date",
+				"type": "date"
+			},
+			{
+				"name": "total_amount",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "invoice"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

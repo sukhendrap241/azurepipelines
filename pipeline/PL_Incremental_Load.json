@@ -1,0 +1,180 @@
+{
+	"name": "PL_Incremental_Load",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy orders",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "LKP_OLD",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "LKP_NEW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT * \nFROM order_table \nWHERE insertdatetime > '@{activity('LKP_OLD').output.firstRow.old_value}' \n  AND insertdatetime <= '@{activity('LKP_NEW').output.firstRow.new_value}'\n",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SQL_SRC_DB",
+						"type": "DatasetReference",
+						"parameters": {
+							"Table_Name": "order_table"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "SQL_order_table_tgt",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "LKP_OLD",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select table_name,last_updated as old_value from watermark where table_name ='order_table'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SQL_watermark_tbl_tgt",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "LKP_NEW",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select max(insertdatetime) as new_value from order_table",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SQL_SRC_DB",
+						"type": "DatasetReference",
+						"parameters": {
+							"Table_Name": "order_table"
+						}
+					}
+				}
+			},
+			{
+				"name": "updatedwatermark",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Copy orders",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[spSetWatermark]",
+					"storedProcedureParameters": {
+						"NewTime": {
+							"value": {
+								"value": "@activity('LKP_NEW').output.firstRow.new_value",
+								"type": "Expression"
+							},
+							"type": "Datetime"
+						},
+						"table_name": {
+							"value": {
+								"value": "@activity('LKP_OLD').output.firstRow.table_name",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"Table_Name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-06-29T08:33:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,49 @@
+{
+	"name": "DS_Orders_data",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Sukhendra_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "dataflow"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "purchase_order.csv",
+				"folderPath": "Apple_sales/2025",
+				"fileSystem": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "order_id",
+				"type": "String"
+			},
+			{
+				"name": "customer_id",
+				"type": "String"
+			},
+			{
+				"name": "order_date",
+				"type": "String"
+			},
+			{
+				"name": "amount",
+				"type": "String"
+			},
+			{
+				"name": "status",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

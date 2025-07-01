@@ -1,0 +1,31 @@
+{
+	"name": "SQL_watermark_tbl_tgt",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "watermark_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "table_name",
+				"type": "varchar"
+			},
+			{
+				"name": "last_updated",
+				"type": "timestamp"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "watermark"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
