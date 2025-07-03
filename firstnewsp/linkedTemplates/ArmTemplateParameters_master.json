@@ -1,0 +1,45 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "firstnewsp"
+		},
+		"AzureSqlDatabase1_password": {
+			"value": ""
+		},
+		"Azure_DB_SRC_password": {
+			"value": ""
+		},
+		"LS_Sukhendra_Storage_accountKey": {
+			"value": ""
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"value": "spcoreserver.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"value": "Trainingdatabase02"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"value": "SQLadmin"
+		},
+		"Azure_DB_SRC_properties_typeProperties_server": {
+			"value": "spcoreserver.database.windows.net"
+		},
+		"Azure_DB_SRC_properties_typeProperties_database": {
+			"value": "Trainingdatabase01"
+		},
+		"Azure_DB_SRC_properties_typeProperties_userName": {
+			"value": "SQLadmin"
+		},
+		"LS_Sukhendra_Storage_properties_typeProperties_url": {
+			"value": "https://sukhendra.dfs.core.windows.net/"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
